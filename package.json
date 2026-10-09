@@ -27,7 +27,8 @@
     "./skill-tool": "./dsh-tool-skill/lib/index.js",
     "./skill-types": "./dsh-skill/lib/index.js",
     "./client": "./lib/client.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    ".": "./dsh-experimental-tool-agent-team/lib/index.js"
   },
   "files": [
     "cordis.patch.yml",

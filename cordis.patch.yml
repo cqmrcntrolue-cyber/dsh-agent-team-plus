@@ -37,7 +37,7 @@
         disposalTimeoutMs: 5000
 
     - id: tool-agent-team-plus
-      name: '@dsh-community/dsh-agent-team-plus/tool-agent-team'
+      name: '@dsh-community/dsh-agent-team-plus'
       config:
         freshProvider: spawn
         forkProvider: fork
