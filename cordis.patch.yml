@@ -1,0 +1,43 @@
+# dsh-agent-team-plus bundle patch. Mirrors the official
+# dsh-experimental-agent-team-profile layer: disable legacy subagent control
+# tools, then insert the vendored Team runtime and tool layer.
+# Differences from upstream: plugin ids/names carry the _plus suffix, the
+# vendored runtime accepts per-member model routes (D3), and the official UI
+# panel is disabled until our own client bundle exists (S4).
+
+- id: tool-subagent-control
+  disabled: true
+
+- id: tool-subagent-list-agents
+  disabled: true
+
+- id: tool-subagent
+  disabled: true
+
+- id: tool-subagent-fork
+  disabled: true
+
+- id: agent-team
+  disabled: true
+
+- id: tool-agent-team
+  disabled: true
+
+- id: ui-agent-team
+  disabled: true
+
+- insert:
+    - id: agent-team-plus
+      name: '@dsh-community/dsh-agent-team-plus/agent-team'
+      config:
+        maxMembers: 8
+        maxTasks: 256
+        maxPendingMessagesPerMember: 64
+        maxMessageBytes: 65536
+        disposalTimeoutMs: 5000
+
+    - id: tool-agent-team-plus
+      name: '@dsh-community/dsh-agent-team-plus/tool-agent-team'
+      config:
+        freshProvider: spawn
+        forkProvider: fork

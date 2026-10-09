@@ -1,0 +1,10 @@
+{
+  "title": {
+    "en": "Agent Team Plus",
+    "zh": "Agent Team Plus（逐队员模型）"
+  },
+  "description": {
+    "en": "Per-member configurable Agent Teams: each teammate can run a different model with the official durable-mailbox roundtable preserved.",
+    "zh": "逐队员可配置的 Agent Teams：每名队员可指定不同模型，保留官方持久邮箱真圆桌协作。"
+  }
+}

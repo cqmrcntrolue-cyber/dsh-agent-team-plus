@@ -1,0 +1,15 @@
+{
+  "name": "@dsh-community/dsh-agent-team-plus/tool-agent-team",
+  "version": "0.1.0-alpha.1",
+  "type": "module",
+  "license": "MIT",
+  "main": "dsh-experimental-tool-agent-team/lib/index.js",
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.0",
+    "@deepseek-ai/dsh-agent": "*",
+    "@deepseek-ai/dsh-session": "*",
+    "@deepseek-ai/dsh-system-prompt": "*",
+    "@deepseek-ai/dsh-tools": "*",
+    "@deepseek-ai/schemastery": "*"
+  }
+}

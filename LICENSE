@@ -1,0 +1,8 @@
+MIT License
+
+Copyright (c) 2026 dsh-agent-team-plus contributors
+
+This plugin vendors and extends packages from the DeepSeek Harness project,
+each under the MIT License with copyright DeepSeek AI. See LICENSES.md for
+the per-package provenance. Upstream license texts are preserved in each
+vendored directory (LICENSE).
