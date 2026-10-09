@@ -1,13 +1,11 @@
-// React 由加载器经注入的 require 提供（PLATFORM_MODULES），运行时为全局 UMD。
-declare const React: any
-
 /**
  * dsh-agent-team-plus client 半（S4）：名册管理入口 + 设置面板。
  * - shell.overlay 挂"名册管理"入口按钮（空白新会话也可用）
  * - 面板内：名册条目列表（加载/删除）+ 创建表单（保存写回 ~/.dsh/agent-team-plus/*.yaml）
  * - 数据经 host 半注册的 /api/agent-team-plus/roster 路由（同源 + 浏览器认证）
  */
-import { createElement } from 'react'
+import { createElement, useState, useEffect, useMemo, useRef } from 'react'
+import * as React from 'react'
 
 const inject = ['slots', 'layout', 'sessions', 'uiConversation', 'uiSession']
 
