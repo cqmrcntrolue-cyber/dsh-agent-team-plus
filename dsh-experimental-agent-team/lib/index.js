@@ -406,7 +406,8 @@ var TeamRoster = class {
 						root,
 						id: TeamId(root.id),
 						role: "teammate",
-						name: member.name
+						name: member.name,
+						member
 					};
 					if (this.subagentDescriptor(agent)) return void 0;
 					return {
@@ -458,6 +459,9 @@ var TeamRoster = class {
 				provider: member.provider,
 				context: member.context,
 				...model === void 0 ? {} : { model },
+				// dsh-agent-team-plus (S3): durable per-member tool filter (roster
+				// skill policy), for model-facing observability.
+				...member.toolFilter === void 0 ? {} : { toolFilter: member.toolFilter },
 				diagnostics: member.error === void 0 ? [] : [member.error]
 			});
 		}
@@ -560,7 +564,14 @@ var TeamRoster = class {
 			context: request.context,
 			phase: "provisioning",
 			// dsh-agent-team-plus: immutable per-member model route (D3).
-			...request.model !== void 0 ? { model: request.model } : {}
+			...request.model !== void 0 ? { model: request.model } : {},
+			// dsh-agent-team-plus (S3): immutable per-member tool filter (roster
+			// skill policy); persists in the member journal record and mirrors the
+			// subagent descriptor's own toolFilter.
+			...request.toolFilter !== void 0 ? { toolFilter: request.toolFilter } : {},
+			// dsh-agent-team-plus (S3): immutable per-member skill allowlist
+			// (roster list mode); the durable source for the member-skill shadow.
+			...request.skills !== void 0 ? { skills: request.skills } : {}
 		};
 		await this.journal.transact(root.id, async () => {
 			const state = this.journal.state(root);
@@ -585,7 +596,10 @@ var TeamRoster = class {
 					...(request.model !== void 0 || request.reasoningEffort !== void 0) ? { agentOptions: {
 						...request.model !== void 0 ? { model: request.model } : {},
 						...request.reasoningEffort !== void 0 ? { reasoningEffort: request.reasoningEffort } : {}
-					} } : {}
+					} } : {},
+					// dsh-agent-team-plus (S3): official per-child tool restriction;
+					// persisted by the subagent descriptor and restored on cold resume.
+					...(request.toolFilter !== void 0 ? { toolFilter: request.toolFilter } : {})
 				},
 				signal
 			});
@@ -709,6 +723,7 @@ var TeamRoster = class {
 			provider: member.provider,
 			context: member.context,
 			...model === void 0 ? {} : { model },
+			...member.toolFilter === void 0 ? {} : { toolFilter: member.toolFilter },
 			diagnostics: []
 		};
 	}
@@ -1170,6 +1185,15 @@ const teamMemberSnapshotSchema = z$1.object({
 	// dsh-agent-team-plus: immutable per-member model route (D3). Optional so
 	// pre-upgrade logs without the field still replay.
 	model: z$1.string().optional(),
+	// dsh-agent-team-plus (S3): immutable per-member tool filter from the roster
+	// skill policy. Optional so pre-upgrade logs without the field still replay.
+	toolFilter: z$1.object({
+		allow: z$1.array(z$1.string()).optional(),
+		deny: z$1.array(z$1.string()).optional()
+	}).optional(),
+	// dsh-agent-team-plus (S3): immutable per-member skill allowlist (roster
+	// list mode). Optional so pre-upgrade logs without the field still replay.
+	skills: z$1.array(z$1.string()).optional(),
 	error: z$1.string().optional()
 }).strict();
 const teamTaskSnapshotSchema = z$1.object({

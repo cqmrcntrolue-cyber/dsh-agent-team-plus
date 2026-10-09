@@ -241,6 +241,21 @@ function install(agent, ctx, config) {
 			order: scoped.systemPrompt.getSectionOrder("TEAM_POLICY"),
 			text: POLICY
 		}));
+		// dsh-agent-team-plus (S3): list-mode skill allowlist guard. Teammates
+		// with a roster skills list may load only listed skills, even by direct
+		// name through the official preset skill tool. Registered in the
+		// member's own scope, so the Lead and ordinary sessions are unaffected.
+		import("../../lib/member-skills.js").then(({ memberSkillsFor }) => {
+			const disposer = scoped.tools.guard((exec) => {
+				if (exec.name !== "skill") return undefined;
+				const policy = memberSkillsFor(exec.agent);
+				if (policy === undefined || policy.mode !== "list") return undefined;
+				const name = exec.arguments?.name;
+				if (typeof name === "string" && policy.list.has(name)) return undefined;
+				return `skill "${String(name)}" is not in this teammate's skill allowlist (${[...policy.list].join(", ")})`;
+			});
+			register(disposer);
+		}).catch(() => undefined);
 		register(scoped.tools.register(defineTool({
 			name: "spawn_teammate_plus",
 			description: "Create one named, durable teammate. Only the Team Lead may call this tool.",
@@ -276,18 +291,21 @@ function install(agent, ctx, config) {
 				// roster entries (human-authored). The Lead cannot appoint a
 				// large model teammate on its own authority.
 				let requestFields;
-				let skillsPolicy; // dsh-agent-team-plus (S3): from roster entry only
+				let toolFilter; // dsh-agent-team-plus (S3): official per-child tool restriction, persisted in the descriptor
+				let listSkills; // dsh-agent-team-plus (S3): list-mode allowlist, persisted in the member record
 				if (args.from !== undefined) {
 					const { readRoster, entryToSpawnFields } = await import("../../lib/roster-file.js");
 					const roster = await readRoster();
 					const entry = roster.get(args.from);
 					if (entry === undefined) throw new Error(`dsh-agent-team-plus: roster entry "${args.from}" not found in ${".dsh/agent-team-plus"}`);
 					requestFields = entryToSpawnFields(entry);
-					if (entry.skills !== undefined) {
-						skillsPolicy = entry.skills === "all" ? { mode: "all" }
-							: entry.skills === "none" ? { mode: "none" }
-							: { mode: "list", list: new Set(entry.skills) };
-					}
+					// dsh-agent-team-plus (S3): skills: none denies the skill loader via
+					// the official toolFilter (persisted in the subagent descriptor, so
+					// cold resume restores it). skills: all needs no action. List mode
+					// persists in the member record and the member-skill shadow
+					// (registered below and on cold resume) enforces it.
+					if (entry.skills === "none") toolFilter = { deny: ["skill"] };
+					else if (Array.isArray(entry.skills)) listSkills = entry.skills;
 					if (args.name !== undefined || args.description !== undefined) throw new Error("dsh-agent-team-plus: `from` cannot be combined with name/description");
 				} else {
 					if (typeof args.name !== "string" || typeof args.description !== "string") throw new Error("spawn_teammate_plus requires `from` (roster entry) or both name and description");
@@ -295,6 +313,8 @@ function install(agent, ctx, config) {
 				}
 				const spawned = await ctx.agentTeams.spawnTeammate(agent, {
 					...requestFields,
+					...(toolFilter !== undefined ? { toolFilter } : {}),
+					...(listSkills !== undefined ? { skills: listSkills } : {}),
 					prompt: [{
 						type: "text",
 						text: `<system-reminder>
@@ -303,6 +323,7 @@ Your Team Lead is named "lead".
 Use list_agents({}) to find your teammates and their names.
 To message your Team Lead, use send_message({ target: "lead", message: "..." }).
 To message another teammate, use send_message({ target: "<teammate name>", message: "..." }).
+${toolFilter !== undefined ? "You have NO skills available in this session: the skill tool is disabled for you. Do not attempt to call it." : ""}${listSkills !== undefined ? `Your skill allowlist for this session is exactly: ${listSkills.join(", ")}. Any other skill is unavailable to you; calling the skill tool with a name outside this list is denied.` : ""}
 </system-reminder>
 
 `
@@ -314,12 +335,12 @@ To message another teammate, use send_message({ target: "<teammate name>", messa
 					provider: context === "fork" ? config.forkProvider : config.freshProvider,
 					signal: exec.signal
 				});
-				// dsh-agent-team-plus (S3): bind the roster skill policy to the new
-				// member's agent id so the vendored tool-skill filters its catalog
-				// and get() for this member only.
-				if (skillsPolicy !== undefined) {
+				// dsh-agent-team-plus (S3): bind the list-mode member-skill shadow
+				// for this member now; cold resume re-binds it from the durable
+				// member record via restoreMemberSkills() in maybeInstall.
+				if (listSkills !== undefined) {
 					const { registerMemberSkills } = await import("../../lib/member-skills.js");
-					registerMemberSkills(spawned.member.id, skillsPolicy);
+					registerMemberSkills(spawned.member.id, { mode: "list", list: new Set(listSkills) });
 				}
 				return { member: modelMember(spawned.member) };
 			}
@@ -581,6 +602,10 @@ function apply(ctx, config = {}) {
 	const installed = /* @__PURE__ */ new Map();
 	const maybeInstall = (agent) => {
 		if (installed.has(agent) || ctx.agentTeams.tryMembership(agent) === void 0) return;
+		// dsh-agent-team-plus (S3): restore the list-mode member-skill shadow on
+		// cold resume. The membership resolves only when the journal has the
+		// member row, and the durable toolFilter carries the list for it.
+		import("../../lib/member-skills.js").then(({ restoreMemberSkills }) => restoreMemberSkills(agent, ctx.agentTeams)).catch(() => undefined);
 		installed.set(agent, install(agent, ctx, resolved));
 	};
 	for (const agent of ctx.agents.list()) maybeInstall(agent);
