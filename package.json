@@ -1,68 +1,68 @@
 {
-    "name":  "@dsh-community/dsh-agent-team-plus",
-    "version":  "0.1.0-alpha.1",
-    "description":  "Per-member configurable (model / reasoning effort) Agent Teams for DeepSeek Harness, with the official durable-mailbox roundtable fully preserved. Vendored and extended from @deepseek-ai Agent Teams (MIT).",
-    "type":  "module",
-    "license":  "MIT",
-    "scripts":  {
-                    "build":  "tsdown",
-                    "typecheck":  "tsc --noEmit"
-                },
-    "dsh":  {
-                "bundle":  {
-                               "patch":  "./cordis.patch.yml"
-                           },
-                "client":  {
-                               "inject":  [
-                                              "@deepseek-ai/cordis",
-                                              "@deepseek-ai/dsh-client-ui-slots",
-                                              "@deepseek-ai/dsh-client-web-react",
-                                              "@deepseek-ai/dsh-client-ui-primitives"
-                                          ],
-                               "platform":  "web"
-                           }
-            },
-    "exports":  {
-                    "./agent-team":  "./dsh-experimental-agent-team/lib/index.js",
-                    "./tool-agent-team":  "./dsh-experimental-tool-agent-team/lib/index.js",
-                    "./skill-tool":  "./dsh-tool-skill/lib/index.js",
-                    "./skill-types":  "./dsh-skill/lib/index.js",  "./client":  "./lib/client.js",
-                    "./package.json":  "./package.json"
-                },
-    "files":  [
-                  "cordis.patch.yml",
-                  "dsh-experimental-agent-team",
-                  "dsh-experimental-tool-agent-team",
-                  "dsh-tool-skill",
-                  "dsh-skill",
-                  "locale",
-                  "icon.svg",
-                  "LICENSE",
-                  "LICENSES.md",
-                  "README.md",
-                  "src",
-                  "tsdown.config.ts",
-                  "lib/client.js"
-              ],
-    "peerDependencies":  {
-                             "@deepseek-ai/cordis":  "\u003e=4.0.0",
-                             "@deepseek-ai/dsh-agent":  "*",
-                             "@deepseek-ai/dsh-brand":  "*",
-                             "@deepseek-ai/dsh-invariants":  "*",
-                             "@deepseek-ai/dsh-llm":  "*",
-                             "@deepseek-ai/dsh-scope":  "*",
-                             "@deepseek-ai/dsh-session":  "*",
-                             "@deepseek-ai/dsh-session-persistence":  "*",
-                             "@deepseek-ai/dsh-session-projection":  "*",
-                             "@deepseek-ai/dsh-subagent":  "*",
-                             "@deepseek-ai/dsh-system-prompt":  "*",
-                             "@deepseek-ai/dsh-tools":  "*",
-                             "@deepseek-ai/schemastery":  "*",
-                             "zod":  "*"
-                         },
-    "devDependencies":  {
-                            "tsdown":  "^0.12.0",
-                            "typescript":  "^5.6.0",
-                            "@types/react":  "^18.0.0"
-                        }
+  "name": "@dsh-community/dsh-agent-team-plus",
+  "version": "0.1.0-alpha.1",
+  "description": "Per-member configurable (model / reasoning effort) Agent Teams for DeepSeek Harness, with the official durable-mailbox roundtable fully preserved. Vendored and extended from @deepseek-ai Agent Teams (MIT).",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/cordis",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-primitives"
+      ],
+      "platform": "web"
+    }
+  },
+  "exports": {
+    "./agent-team": "./dsh-experimental-agent-team/lib/index.js",
+    "./tool-agent-team": "./dsh-experimental-tool-agent-team/lib/index.js",
+    "./skill-tool": "./dsh-tool-skill/lib/index.js",
+    "./skill-types": "./dsh-skill/lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "cordis.patch.yml",
+    "dsh-experimental-agent-team",
+    "dsh-experimental-tool-agent-team",
+    "dsh-tool-skill",
+    "dsh-skill",
+    "locale",
+    "icon.svg",
+    "LICENSE",
+    "LICENSES.md",
+    "README.md",
+    "src",
+    "tsdown.config.ts",
+    "lib/client.js"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.0",
+    "@deepseek-ai/dsh-agent": "*",
+    "@deepseek-ai/dsh-brand": "*",
+    "@deepseek-ai/dsh-invariants": "*",
+    "@deepseek-ai/dsh-llm": "*",
+    "@deepseek-ai/dsh-scope": "*",
+    "@deepseek-ai/dsh-session": "*",
+    "@deepseek-ai/dsh-session-persistence": "*",
+    "@deepseek-ai/dsh-session-projection": "*",
+    "@deepseek-ai/dsh-subagent": "*",
+    "@deepseek-ai/dsh-system-prompt": "*",
+    "@deepseek-ai/dsh-tools": "*",
+    "@deepseek-ai/schemastery": "*",
+    "zod": "*"
+  },
+  "devDependencies": {
+    "tsdown": "^0.12.0",
+    "typescript": "^5.6.0",
+    "@types/react": "^18.0.0"
+  }
 }
