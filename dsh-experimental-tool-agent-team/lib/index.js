@@ -64,6 +64,19 @@ const MEMBER_VIEW_SCHEMA = {
 			enum: ["fresh", "fork"]
 		},
 		model: { type: "string" },
+		// dsh-agent-team-plus (S3): durable per-member skill policy echo.
+		toolFilter: {
+			type: "object",
+			additionalProperties: false,
+			properties: {
+				allow: { type: "array", items: { type: "string" } },
+				deny: { type: "array", items: { type: "string" } }
+			}
+		},
+		skills: {
+			type: "array",
+			items: { type: "string" }
+		},
 		diagnostics: {
 			type: "array",
 			required: true,
