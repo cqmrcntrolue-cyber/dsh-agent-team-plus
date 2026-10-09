@@ -571,7 +571,7 @@ function apply(ctx, config = {}) {
 	// dsh-agent-team-plus (S4): expose the roster management HTTP API when the
 	// connection transport exists (web/desktop profiles). Headless profiles
 	// without the connection service skip it.
-	try { writeFileSync(String.fromCharCode(67,58,92,92,68,83,72,32,98,97,115,101,92,92,112,108,117,103,105,110,92,92,97,112,105,45,112,114,111,111,102,46,116,120,116), 'connection=' + (ctx.connection !== undefined) + ' fetch=' + (ctx.connection?.fetch !== undefined) + ' at ' + new Date().toISOString()) } catch (e) { try { writeFileSync(String.fromCharCode(67,58,92,92,68,83,72,32,98,97,115,101,92,92,112,108,117,103,105,110,92,92,97,112,105,45,112,114,111,111,102,45,101,114,114,46,116,120,116), String(e)) } catch {} }
+	try { writeFileSync(String.fromCharCode(68,58,92,92,68,83,72,32,98,97,115,101,92,92,112,108,117,103,105,110,92,92,97,112,105,45,112,114,111,111,102,46,116,120,116), 'connection=' + (ctx.connection !== undefined) + ' fetch=' + (ctx.connection?.fetch !== undefined) + ' at ' + new Date().toISOString()) } catch (e) { try { writeFileSync(String.fromCharCode(68,58,92,92,68,83,72,32,98,97,115,101,92,92,112,108,117,103,105,110,92,92,97,112,105,45,112,114,111,111,102,45,101,114,114,46,116,120,116), String(e)) } catch {} }
 	if (ctx.connection?.fetch?.register !== undefined) {
 		import("../../lib/roster-api.js").then(({ registerRosterApi }) => {
 			const dispose = registerRosterApi(ctx);
