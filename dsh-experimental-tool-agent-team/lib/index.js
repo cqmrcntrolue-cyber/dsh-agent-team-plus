@@ -1,4 +1,3 @@
-import { writeFileSync } from "node:fs";
 import z from "@deepseek-ai/schemastery";
 import { TeamTaskId } from "../../dsh-experimental-agent-team/lib/index.js";
 import { defineTool } from "@deepseek-ai/dsh-tools";
@@ -571,14 +570,12 @@ function apply(ctx, config = {}) {
 	// dsh-agent-team-plus (S4): expose the roster management HTTP API when the
 	// connection transport exists (web/desktop profiles). Headless profiles
 	// without the connection service skip it.
-	try { writeFileSync(String.fromCharCode(68,58,92,92,68,83,72,32,98,97,115,101,92,92,112,108,117,103,105,110,92,92,97,112,105,45,112,114,111,111,102,46,116,120,116), 'connection=' + (ctx.connection !== undefined) + ' fetch=' + (ctx.connection?.fetch !== undefined) + ' at ' + new Date().toISOString()) } catch (e) { try { writeFileSync(String.fromCharCode(68,58,92,92,68,83,72,32,98,97,115,101,92,92,112,108,117,103,105,110,92,92,97,112,105,45,112,114,111,111,102,45,101,114,114,46,116,120,116), String(e)) } catch {} }
-	try { writeFileSync("D:\\\\DSH base\\\\plugin\\\\api-proof.txt", "webServer guard entered, register exists=" + (ctx.webServer?.register !== undefined) + " at " + new Date().toISOString()); } catch {}
 	if (ctx.webServer?.register !== undefined) {
 		import("../../lib/roster-api.js").then(({ registerRosterApi }) => {
 			const dispose = registerRosterApi(ctx);
 			ctx.effect(() => dispose, "agent-team-plus: roster api");
 		}).catch((error) => {
-			writeFileSync("D:\\\\DSH base\\\\plugin\\\\api-proof-err.txt", "register failed: " + String(error?.stack ?? error));
+			console.warn("dsh-agent-team-plus: roster api registration failed:", String(error?.stack ?? error));
 		});
 	}
 	const installed = /* @__PURE__ */ new Map();
