@@ -13,7 +13,7 @@ const inject = [
 	"tools",
 	"systemPrompt",
 	// dsh-agent-team-plus (S4): roster HTTP API rides the connection fetch registry
-	"connection"
+	"webServer"
 ];
 /** Loader schema for the opt-in Team tool plugin. */
 const Config = z.object({
@@ -572,7 +572,7 @@ function apply(ctx, config = {}) {
 	// connection transport exists (web/desktop profiles). Headless profiles
 	// without the connection service skip it.
 	try { writeFileSync(String.fromCharCode(68,58,92,92,68,83,72,32,98,97,115,101,92,92,112,108,117,103,105,110,92,92,97,112,105,45,112,114,111,111,102,46,116,120,116), 'connection=' + (ctx.connection !== undefined) + ' fetch=' + (ctx.connection?.fetch !== undefined) + ' at ' + new Date().toISOString()) } catch (e) { try { writeFileSync(String.fromCharCode(68,58,92,92,68,83,72,32,98,97,115,101,92,92,112,108,117,103,105,110,92,92,97,112,105,45,112,114,111,111,102,45,101,114,114,46,116,120,116), String(e)) } catch {} }
-	if (ctx.connection?.fetch?.register !== undefined) {
+	if (ctx.webServer?.register !== undefined) {
 		import("../../lib/roster-api.js").then(({ registerRosterApi }) => {
 			const dispose = registerRosterApi(ctx);
 			ctx.effect(() => dispose, "agent-team-plus: roster api");
