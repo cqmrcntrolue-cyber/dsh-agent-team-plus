@@ -1,4 +1,4 @@
-# dsh-agent-team-plus bundle patch. Mirrors the official
+﻿# dsh-agent-team-plus bundle patch. Mirrors the official
 # dsh-experimental-agent-team-profile layer: disable legacy subagent control
 # tools, then insert the vendored Team runtime and tool layer.
 # Differences from upstream: plugin ids/names carry the _plus suffix, the
@@ -30,7 +30,7 @@
     - id: agent-team-plus
       name: '@dsh-community/dsh-agent-team-plus/agent-team'
       config:
-        maxMembers: 8
+        maxMembers: 16
         maxTasks: 256
         maxPendingMessagesPerMember: 64
         maxMessageBytes: 65536
