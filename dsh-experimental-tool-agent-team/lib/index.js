@@ -304,7 +304,7 @@ function install(agent, ctx, config) {
 				// roster entries (human-authored). The Lead cannot appoint a
 				// large model teammate on its own authority.
 				let requestFields;
-				let toolFilter; // dsh-agent-team-plus (S3): official per-child tool restriction, persisted in the descriptor
+				let denyTools = []; // dsh-agent-team-plus (S3/S2): merged tool deny list for the official per-child restriction
 				let listSkills; // dsh-agent-team-plus (S3): list-mode allowlist, persisted in the member record
 				if (args.from !== undefined) {
 					const { readRoster, entryToSpawnFields } = await import("../../lib/roster-file.js");
@@ -317,8 +317,12 @@ function install(agent, ctx, config) {
 					// cold resume restores it). skills: all needs no action. List mode
 					// persists in the member record and the member-skill shadow
 					// (registered below and on cold resume) enforces it.
-					if (entry.skills === "none") toolFilter = { deny: ["skill"] };
+					if (entry.skills === "none") denyTools.push("skill");
 					else if (Array.isArray(entry.skills)) listSkills = entry.skills;
+					// dsh-agent-team-plus (S2): roster tools.deny merges into the same
+					// official restriction (e.g. deny write for a read-only member).
+					if (Array.isArray(entry.tools?.deny)) denyTools.push(...entry.tools.deny);
+					if (denyTools.length > 0) toolFilter = { deny: denyTools };
 					if (args.name !== undefined || args.description !== undefined) throw new Error("dsh-agent-team-plus: `from` cannot be combined with name/description");
 				} else {
 					if (typeof args.name !== "string" || typeof args.description !== "string") throw new Error("spawn_teammate_plus requires `from` (roster entry) or both name and description");
