@@ -10,6 +10,10 @@ const inject = [
 	"agents",
 	"agentTeams",
 	"tools",
+	// dsh-agent-team-plus (S4d): roster skills API calls ctx.skills.snapshot —
+	// the missing inject made the panel's skill list fail with
+	// "cannot get property \"skills\" without inject" since S4.
+	"skills",
 	"systemPrompt",
 	// dsh-agent-team-plus (S4): roster HTTP API rides the connection fetch registry
 	"webServer",
