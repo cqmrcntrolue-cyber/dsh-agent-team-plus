@@ -12,7 +12,9 @@ const inject = [
 	"tools",
 	"systemPrompt",
 	// dsh-agent-team-plus (S4): roster HTTP API rides the connection fetch registry
-	"webServer"
+	"webServer",
+	// dsh-agent-team-plus (S4b): model catalog for the roster panel (listProviders/listModels)
+	"llm"
 ];
 /** Loader schema for the opt-in Team tool plugin. */
 const Config = z.object({
