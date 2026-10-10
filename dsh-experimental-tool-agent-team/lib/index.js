@@ -304,7 +304,7 @@ function install(agent, ctx, config) {
 				// roster entries (human-authored). The Lead cannot appoint a
 				// large model teammate on its own authority.
 				let requestFields;
-				let denyTools = []; // dsh-agent-team-plus (S3/S2): merged tool deny list for the official per-child restriction
+				let toolFilter; // dsh-agent-team-plus (S3/S2): official per-child tool restriction, persisted in the descriptor
 				let listSkills; // dsh-agent-team-plus (S3): list-mode allowlist, persisted in the member record
 				if (args.from !== undefined) {
 					const { readRoster, entryToSpawnFields } = await import("../../lib/roster-file.js");
@@ -317,6 +317,7 @@ function install(agent, ctx, config) {
 					// cold resume restores it). skills: all needs no action. List mode
 					// persists in the member record and the member-skill shadow
 					// (registered below and on cold resume) enforces it.
+					const denyTools = []; // merged deny list: skill gate + roster tools.deny
 					if (entry.skills === "none") denyTools.push("skill");
 					else if (Array.isArray(entry.skills)) listSkills = entry.skills;
 					// dsh-agent-team-plus (S2): roster tools.deny merges into the same
