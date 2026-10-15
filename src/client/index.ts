@@ -1,4 +1,4 @@
-﻿/**
+/**
  * dsh-agent-team-plus client 半（S4b）：名册 + 团队阵容 双 tab 面板。
  * - shell.overlay 挂入口按钮（空白新会话也可用）
  * - tab 名册：条目列表 + 创建/编辑表单（model=宿主模型目录可勾选下拉、
@@ -167,6 +167,7 @@ function RosterPanel(props) {
       setEditing({ ...editing, tools: next.length > 0 ? { deny: next } : undefined })
     }
     return createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 10, border: `1px solid ${LINE}`, borderRadius: 8, padding: 12 } },
+      ErrorBar(error),
       Field('name（lower-kebab-case，创建后不可改）',
         TextInput(editing.name, (v) => setEditing({ ...editing, name: v.trim() }), { placeholder: 'code-reviewer' })),
       Field('description（队员人设一句话）',
@@ -226,6 +227,7 @@ function RosterPanel(props) {
           })),
           Btn('删除', () => remove(e.name)))))
   return createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } },
+    ErrorBar(error),
     createElement('div', { style: { display: 'flex', alignItems: 'center', marginBottom: 6 } },
       createElement('div', { style: { flex: 1, fontSize: 11, color: DIM } },
         '名册条目保存于 ~/.dsh/agent-team-plus/*.yaml（唯一真源）；Lead 用 spawn_teammate_plus({from: "名字"}) 实例化'),
