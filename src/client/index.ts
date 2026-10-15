@@ -183,14 +183,41 @@ function RosterPanel(props) {
         TextInput(editing.name, (v) => setEditing({ ...editing, name: v.trim() }), { placeholder: 'code-reviewer' })),
       Field('description（队员人设一句话）',
         TextInput(editing.description ?? '', (v) => setEditing({ ...editing, description: v }))),
-      createElement('div', { style: { display: 'flex', gap: 8 } },
-        Field(`model（宿主模型目录 ${models.length} 项；空=继承 Lead）`,
-          Select(editing.model ? `${editing.modelProvider ?? ''}|${editing.model}` : '', (v) => {
-            if (v === '') return setEditing({ ...editing, model: undefined, modelProvider: undefined })
-            const sep = v.indexOf('|')
-            const pickedProvider = v.slice(0, sep), pickedId = v.slice(sep + 1)
-            setEditing({ ...editing, model: pickedId, modelProvider: pickedProvider })
-          }), modelOptions),
+      createElement('div', {},
+        createElement('div', { style: { fontSize: 11, color: DIM, marginBottom: 4 } },
+          `model（宿主模型目录 ${models.length} 项；点击卡片选择，再点一次取消=继承 Lead）`),
+        createElement('div', {
+          style: {
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))',
+            gap: 4, maxHeight: 190, overflowY: 'auto',
+          },
+        },
+          createElement('label', {
+            key: '__inherit',
+            onClick: () => setEditing({ ...editing, model: undefined, modelProvider: undefined }),
+            style: {
+              display: 'flex', gap: 6, alignItems: 'center', fontSize: 12,
+              background: !editing.model ? '#1d3a5f' : '#24334a',
+              border: `1px solid ${!editing.model ? ACCENT : LINE}`, borderRadius: 6, padding: '4px 8px',
+              cursor: 'pointer',
+            },
+          }, '继承 Lead'),
+          ...(models ?? []).map((m) => {
+            const key = `${m.provider}|${m.id}`
+            const on = editing.model === m.id && (editing.modelProvider ?? '') === m.provider
+            return createElement('label', {
+              key,
+              onClick: () => setEditing({ ...editing, model: m.id, modelProvider: m.provider }),
+              style: {
+                display: 'flex', gap: 6, alignItems: 'center', fontSize: 12,
+                background: on ? '#1d3a5f' : '#24334a',
+                border: `1px solid ${on ? ACCENT : LINE}`, borderRadius: 6, padding: '4px 8px',
+                cursor: 'pointer',
+              },
+            },
+              createElement('span', { style: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } },
+                `${m.name ?? m.id}（${m.provider}）`))
+          })),
         Field('context', Select(editing.context ?? 'fresh', (v) => setEditing({ ...editing, context: v }),
           [{ value: 'fresh', label: 'fresh' }, { value: 'fork', label: 'fork' }]))),
       createElement('div', { style: { display: 'flex', gap: 8 } },
