@@ -184,7 +184,7 @@ function RosterPanel(props) {
       Field('description（队员人设一句话）',
         TextInput(editing.description ?? '', (v) => setEditing({ ...editing, description: v }))),
       createElement('div', { style: { display: 'flex', gap: 8 } },
-        Field('model（宿主模型目录；空=继承 Lead）',
+        Field(`model（宿主模型目录 ${models.length} 项；空=继承 Lead）`,
           Select(editing.model ? `${editing.modelProvider ?? ''}|${editing.model}` : '', (v) => {
             if (v === '') return setEditing({ ...editing, model: undefined, modelProvider: undefined })
             const sep = v.indexOf('|')
