@@ -305,8 +305,9 @@ function PanelRoot(props) {
   const [models, setModels] = useState([])
   const [reloadKey, setReloadKey] = useState(0)
   useEffect(() => {
-    fetch('/api/agent-team-plus/skills').then((r) => r.json()).then((r) => setSkills(r.names ?? [])).catch(() => setSkills([]))
-    fetch('/api/agent-team-plus/models').then((r) => r.json()).then((r) => setModels(r.models ?? [])).catch(() => setModels([]))
+    // cache: 'no-store'——浏览器/宿主代理可能缓存 GET 响应，模型目录会陈旧为空
+    fetch('/api/agent-team-plus/skills', { cache: 'no-store' }).then((r) => r.json()).then((r) => setSkills(r.names ?? [])).catch(() => setSkills([]))
+    fetch('/api/agent-team-plus/models', { cache: 'no-store' }).then((r) => r.json()).then((r) => setModels(r.models ?? [])).catch(() => setModels([]))
   }, [reloadKey])
   const tabBtn = (id, label) => createElement('button', {
     onClick: () => setTab(id),
