@@ -332,6 +332,28 @@ function PanelRoot(props) {
         : createElement(LineupPanel)))
 }
 
+/* ---------- 错误边界：渲染异常不炸整个 slot ---------- */
+
+class PanelErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { error: null }
+  }
+  static getDerivedStateFromError(error) {
+    return { error }
+  }
+  render() {
+    if (this.state.error !== null) {
+      return createElement('div', { style: { padding: 12, color: '#fca5a5', fontSize: 12 } },
+        createElement('div', { style: { fontWeight: 600, marginBottom: 6 } }, 'Agent Team+ 面板渲染出错'),
+        createElement('pre', {
+          style: { background: '#0b1220', borderRadius: 6, padding: 8, whiteSpace: 'pre-wrap', fontSize: 11 },
+        }, String(this.state.error?.stack ?? this.state.error)))
+    }
+    return this.props.children
+  }
+}
+
 /** 入口：shell.overlay 挂按钮 */
 function apply(ctx) {
   ctx.slots.inject('shell.overlay', () => {
@@ -353,7 +375,8 @@ function apply(ctx) {
             cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 10px rgba(0,0,0,0.14)',
           },
         }, '👥'),
-        open && createElement(PanelRoot, { onClose: () => setOpen(false) }))
+        open && createElement(PanelErrorBoundary, {},
+          createElement(PanelRoot, { onClose: () => setOpen(false) })))
     })
   })
 }
