@@ -72,8 +72,10 @@ function TextInput(value, onChange, opts = {}) {
 }
 
 function Select(value, onChange, options) {
+  // 防御：宿主二次渲染等场景 options 可能缺省——空下拉好过整个 slot 崩掉
+  const list = options ?? []
   return createElement('select', { value, onChange: (e) => onChange(e.target.value), style: inputStyle },
-    ...options.map((o) => createElement('option', { value: o.value, key: o.value }, o.label)))
+    ...list.map((o) => createElement('option', { value: o.value, key: o.value ?? o.label }, o.label ?? o.value)))
 }
 
 function Btn(label, onClick, primary = false, disabled = false) {
@@ -91,14 +93,16 @@ function Btn(label, onClick, primary = false, disabled = false) {
 }
 
 function ChipGroup(all, selected, onToggle, emptyHint) {
-  if (all.length === 0) return createElement('div', { style: { fontSize: 11, color: DIM } }, emptyHint)
+  const list = all ?? []
+  if (list.length === 0) return createElement('div', { style: { fontSize: 11, color: DIM } }, emptyHint)
+  const sel = selected ?? []
   return createElement('div', {
     style: {
       display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))',
       gap: 4, maxHeight: 170, overflowY: 'auto',
     },
-  }, ...all.map((item) => {
-    const on = selected.includes(item)
+  }, ...list.map((item) => {
+    const on = sel.includes(item)
     return createElement('label', {
       key: item,
       style: {
