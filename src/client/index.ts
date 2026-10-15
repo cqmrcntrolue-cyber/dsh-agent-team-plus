@@ -126,7 +126,8 @@ function ErrorBar(error) {
 /* ---------- tab 名册（含创建/编辑表单） ---------- */
 
 function RosterPanel(props) {
-  const { skills, models, reload } = props
+  // 解构兜底：宿主 slot 二次渲染等场景下 props 可能不完整
+  const { skills = [], models = [], reload = () => {} } = props ?? {}
   const [entries, setEntries] = useState(null)
   const [editing, setEditing] = useState(null)
   const [error, setError] = useState(undefined)
@@ -155,9 +156,10 @@ function RosterPanel(props) {
 
   // value 用 provider|id 组合键——不同 provider 存在同名模型，纯 id 会让
   // select 永远命中第一个 provider（用户实测 bug）。保存时拆回两个字段。
+  // models 可能未加载/接口失败（undefined），必须兜底为空数组。
   const modelOptions = [
     { value: '', label: '继承 Lead' },
-    ...models.map((m) => ({ value: `${m.provider}|${m.id}`, label: `${m.name}（${m.provider}）` })),
+    ...(models ?? []).map((m) => ({ value: `${m.provider}|${m.id}`, label: `${m.name}（${m.provider}）` })),
   ]
 
   if (editing !== null) {
