@@ -459,6 +459,8 @@ var TeamRoster = class {
 				provider: member.provider,
 				context: member.context,
 				...model === void 0 ? {} : { model },
+				// dsh-agent-team-plus (S4c): durable per-member model provider.
+				...member.modelProvider === void 0 ? {} : { modelProvider: member.modelProvider },
 				// dsh-agent-team-plus (S3): durable per-member tool filter (roster
 				// skill policy), for model-facing observability.
 				...member.toolFilter === void 0 ? {} : { toolFilter: member.toolFilter },
@@ -565,6 +567,9 @@ var TeamRoster = class {
 			phase: "provisioning",
 			// dsh-agent-team-plus: immutable per-member model route (D3).
 			...request.model !== void 0 ? { model: request.model } : {},
+			// dsh-agent-team-plus (S4c): immutable per-member model provider —
+			// disambiguates same-named models across providers.
+			...request.modelProvider !== void 0 ? { modelProvider: request.modelProvider } : {},
 			// dsh-agent-team-plus (S3): immutable per-member tool filter (roster
 			// skill policy); persists in the member journal record and mirrors the
 			// subagent descriptor's own toolFilter.
@@ -592,8 +597,11 @@ var TeamRoster = class {
 				request: {
 					prompt: request.prompt,
 					parent: root,
-					// dsh-agent-team-plus: pass through per-member model route (D3).
-					...(request.model !== void 0 || request.reasoningEffort !== void 0) ? { agentOptions: {
+					// dsh-agent-team-plus: pass through per-member model route (D3,
+					// S4c adds modelProvider so same-named models on different
+					// providers resolve to the roster-selected one).
+					...(request.model !== void 0 || request.reasoningEffort !== void 0 || request.modelProvider !== void 0) ? { agentOptions: {
+						...request.modelProvider !== void 0 ? { provider: request.modelProvider } : {},
 						...request.model !== void 0 ? { model: request.model } : {},
 						...request.reasoningEffort !== void 0 ? { reasoningEffort: request.reasoningEffort } : {}
 					} } : {},
@@ -723,6 +731,7 @@ var TeamRoster = class {
 			provider: member.provider,
 			context: member.context,
 			...model === void 0 ? {} : { model },
+			...member.modelProvider === void 0 ? {} : { modelProvider: member.modelProvider },
 			...member.toolFilter === void 0 ? {} : { toolFilter: member.toolFilter },
 			diagnostics: []
 		};
@@ -1185,6 +1194,9 @@ const teamMemberSnapshotSchema = z$1.object({
 	// dsh-agent-team-plus: immutable per-member model route (D3). Optional so
 	// pre-upgrade logs without the field still replay.
 	model: z$1.string().optional(),
+	// dsh-agent-team-plus (S4c): immutable per-member model provider. Optional
+	// so pre-upgrade logs without the field still replay.
+	modelProvider: z$1.string().optional(),
 	// dsh-agent-team-plus (S3): immutable per-member tool filter from the roster
 	// skill policy. Optional so pre-upgrade logs without the field still replay.
 	toolFilter: z$1.object({

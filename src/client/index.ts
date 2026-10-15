@@ -33,7 +33,10 @@ function yamlFor(data) {
   const lines = [`name: ${data.name}`]
   if (data.description) lines.push(`description: ${data.description}`)
   lines.push(`context: ${data.context ?? 'fresh'}`)
-  if (data.model) lines.push(`model: ${data.model}`)
+  if (data.model) {
+    lines.push(`model: ${data.model}`)
+    if (data.modelProvider) lines.push(`modelProvider: ${data.modelProvider}`)
+  }
   if (data.reasoningEffort) lines.push(`reasoningEffort: ${data.reasoningEffort}`)
   if (data.skills === 'all' || data.skills === 'none') {
     lines.push(`skills: ${data.skills}`)
@@ -150,9 +153,11 @@ function RosterPanel(props) {
     catch (e) { setError(String(e.message)) } finally { setBusy(false) }
   }
 
+  // value 用 provider|id 组合键——不同 provider 存在同名模型，纯 id 会让
+  // select 永远命中第一个 provider（用户实测 bug）。保存时拆回两个字段。
   const modelOptions = [
     { value: '', label: '继承 Lead' },
-    ...models.map((m) => ({ value: m.id, label: `${m.name}（${m.provider}）` })),
+    ...models.map((m) => ({ value: `${m.provider}|${m.id}`, label: `${m.name}（${m.provider}）` })),
   ]
 
   if (editing !== null) {
@@ -174,7 +179,12 @@ function RosterPanel(props) {
         TextInput(editing.description ?? '', (v) => setEditing({ ...editing, description: v }))),
       createElement('div', { style: { display: 'flex', gap: 8 } },
         Field('model（宿主模型目录；空=继承 Lead）',
-          Select(editing.model ?? '', (v) => setEditing({ ...editing, model: v || undefined }), modelOptions)),
+          Select(editing.model ? `${editing.modelProvider ?? ''}|${editing.model}` : '', (v) => {
+            if (v === '') return setEditing({ ...editing, model: undefined, modelProvider: undefined })
+            const sep = v.indexOf('|')
+            const pickedProvider = v.slice(0, sep), pickedId = v.slice(sep + 1)
+            setEditing({ ...editing, model: pickedId, modelProvider: pickedProvider })
+          }), modelOptions),
         Field('context', Select(editing.context ?? 'fresh', (v) => setEditing({ ...editing, context: v }),
           [{ value: 'fresh', label: 'fresh' }, { value: 'fork', label: 'fork' }]))),
       createElement('div', { style: { display: 'flex', gap: 8 } },
@@ -215,14 +225,14 @@ function RosterPanel(props) {
             createElement('div', { style: { fontSize: 11, color: DIM } }, e.description ?? ''),
             createElement('div', { style: { fontSize: 10, color: ACCENT } },
               [
-                e.model ?? '继承 Lead',
+                e.model ? (e.modelProvider ? `${e.model}（${e.modelProvider}）` : e.model) : '继承 Lead',
                 e.context ?? 'fresh',
                 e.skills === undefined ? 'skills: 默认' : e.skills === 'all' ? 'skills: all' : e.skills === 'none' ? 'skills: none' : `skills: 名单(${e.skills.length})`,
                 Array.isArray(e.tools?.deny) && e.tools.deny.length > 0 ? `deny: ${e.tools.deny.join('/')}` : '',
               ].filter(Boolean).join(' · '))),
           Btn('编辑', () => setEditing({
             name: e.name, description: e.description ?? '', context: e.context ?? 'fresh',
-            model: e.model ?? '', reasoningEffort: e.reasoningEffort,
+            model: e.model ?? '', modelProvider: e.modelProvider ?? '', reasoningEffort: e.reasoningEffort,
             skills: e.skills ?? 'all', tools: e.tools,
           })),
           Btn('删除', () => remove(e.name)))))
@@ -268,7 +278,7 @@ function LineupPanel() {  const [members, setMembers] = useState(null)
             createElement('div', { style: { fontSize: 11, color: DIM } }, m.description ?? ''),
             createElement('div', { style: { fontSize: 10, color: ACCENT } },
               [
-                m.model ?? (m.role === 'lead' ? '' : '继承 Lead'),
+                m.model ? (m.modelProvider ? `${m.model}（${m.modelProvider}）` : m.model) : (m.role === 'lead' ? '' : '继承 Lead'),
                 m.context,
                 Array.isArray(m.toolFilter?.deny) && m.toolFilter.deny.length > 0 ? `deny: ${m.toolFilter.deny.join('/')}` : '',
                 Array.isArray(m.skills) ? `skills: 名单(${m.skills.length})` : '',

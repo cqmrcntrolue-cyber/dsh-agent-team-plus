@@ -73,6 +73,8 @@ const MEMBER_VIEW_SCHEMA = {
 			enum: ["fresh", "fork"]
 		},
 		model: { type: "string" },
+		// dsh-agent-team-plus (S4c): provider that owns `model`.
+		modelProvider: { type: "string" },
 		// dsh-agent-team-plus (S3): durable per-member skill policy echo.
 		toolFilter: {
 			type: "object",
